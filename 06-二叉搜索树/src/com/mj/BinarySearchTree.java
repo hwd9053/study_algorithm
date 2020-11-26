@@ -72,21 +72,89 @@ public class BinarySearchTree<E> implements BinaryTreeInfo{
 		return false;
 	}
 	
+//	/**
+//	 * 前序遍历(根结点在前面)
+//	 * 根节点，前序遍历左子树，前序遍历右子树
+//	 * 以下是递归实现
+//	 */
+//	public void preorderTraversal() {
+//		preorderTraversal(root);
+//	}
+//	
+//	public void preorderTraversal(Node<E> node) {
+//		if(node == null) return;
+//		
+//		System.out.print(node.element + ", ");
+//		preorderTraversal(node.left);
+//		preorderTraversal(node.right);
+//	}
+//	
+//	/**
+//	 * 中序遍历(根结点在中间)
+//	 * 中序遍历左子树，根节点，中序遍历右子树
+//	 * 以下是递归实现
+//	 */
+//	public void inorderTraversal() {
+//		inorderTraversal(root);
+//	}
+//	
+//	public void inorderTraversal(Node<E> node) {
+//		if(node == null) return;
+//		
+//		inorderTraversal(node.left);
+//		System.out.print(node.element + ", ");
+//		inorderTraversal(node.right);
+//	}
+//	
+//	/**
+//	 * 后序遍历(根结点在最后)
+//	 * 后序遍历左子树，后序遍历右子树，根节点
+//	 * 以下是递归实现
+//	 */
+//	public void postorderTraversal() {
+//		postorderTraversal(root);
+//	}
+//	
+//	public void postorderTraversal(Node<E> node) {
+//		if(node == null) return;
+//		
+//		postorderTraversal(node.left);
+//		postorderTraversal(node.right);
+//		System.out.print(node.element + ", ");
+//	}
+//	
+//	/**
+//	 * 层序遍历  要求能默写出来。前序等也要求，但因为是递归所以好写
+//	 */
+//	public void levelOrderTraversal() {
+//		if(root == null) return;
+//		
+//		Queue<Node<E>> queue = new LinkedList<>();
+//		queue.offer(root);
+//		
+//		while(!queue.isEmpty()) {
+//			Node<E> node = queue.poll();
+//			System.out.println(node.element);
+//			if(node.left != null) queue.offer(node.left);
+//			if(node.right != null) queue.offer(node.right);
+//		}
+//	}
+	
 	/**
 	 * 前序遍历(根结点在前面)
 	 * 根节点，前序遍历左子树，前序遍历右子树
 	 * 以下是递归实现
 	 */
-	public void preorderTraversal() {
-		preorderTraversal(root);
+	public void preorder(Visitor<E> visitor) {
+		if (visitor == null) return;
+		preorder(root, visitor);
 	}
 	
-	public void preorderTraversal(Node<E> node) {
-		if(node == null) return;
-		
-		System.out.print(node.element + ", ");
-		preorderTraversal(node.left);
-		preorderTraversal(node.right);
+	public void preorder(Node<E> node, Visitor<E> visitor) {
+		if (node == null) return;
+		visitor.visit(node.element);
+		preorder(node.left, visitor);
+		preorder(node.right, visitor);
 	}
 	
 	/**
@@ -94,16 +162,16 @@ public class BinarySearchTree<E> implements BinaryTreeInfo{
 	 * 中序遍历左子树，根节点，中序遍历右子树
 	 * 以下是递归实现
 	 */
-	public void inorderTraversal() {
-		inorderTraversal(root);
+	public void inorder(Visitor<E> visitor) {
+		if (visitor == null) return;
+		inorder(root, visitor);
 	}
 	
-	public void inorderTraversal(Node<E> node) {
-		if(node == null) return;
-		
-		inorderTraversal(node.left);
-		System.out.print(node.element + ", ");
-		inorderTraversal(node.right);
+	public void inorder(Node<E> node, Visitor<E> visitor) {
+		if (node == null) return;
+		inorder(node.left, visitor);
+		visitor.visit(node.element);
+		inorder(node.right, visitor);
 	}
 	
 	/**
@@ -111,33 +179,97 @@ public class BinarySearchTree<E> implements BinaryTreeInfo{
 	 * 后序遍历左子树，后序遍历右子树，根节点
 	 * 以下是递归实现
 	 */
-	public void postorderTraversal() {
-		postorderTraversal(root);
+	public void postorder(Visitor<E> visitor) {
+		if (visitor == null) return;
+		postorder(root, visitor);
 	}
 	
-	public void postorderTraversal(Node<E> node) {
-		if(node == null) return;
-		
-		postorderTraversal(node.left);
-		postorderTraversal(node.right);
-		System.out.print(node.element + ", ");
+	public void postorder(Node<E> node, Visitor<E> visitor) {
+		if (node == null) return;
+		postorder(node.left, visitor);
+		postorder(node.right, visitor);
+		visitor.visit(node.element);
 	}
 	
 	/**
 	 * 层序遍历  要求能默写出来。前序等也要求，但因为是递归所以好写
 	 */
-	public void levelOrderTraversal() {
-		if(root == null) return;
+	public void levelOrder(Visitor<E> visitor) {
+		if(root == null || visitor == null) return;
 		
 		Queue<Node<E>> queue = new LinkedList<>();
 		queue.offer(root);
 		
 		while(!queue.isEmpty()) {
 			Node<E> node = queue.poll();
-			System.out.println(node.element);
+			visitor.visit(node.element);
 			if(node.left != null) queue.offer(node.left);
 			if(node.right != null) queue.offer(node.right);
 		}
+	}
+	
+	// 树的高度,迭代实现(层序遍历)
+	public int height() {
+		if (root == null) return 0;
+		
+		Queue<Node<E>> queue = new LinkedList<>();
+		queue.offer(root);
+		// 树的高度
+		int height = 0;
+		// 存储着每一层的元素数量(根节点所在层有一个元素)
+		int levelSize = 1;
+		
+		while(!queue.isEmpty()) {
+			Node<E> node = queue.poll();
+			levelSize--; // 每次poll后，该层剩余元素减1
+			
+			if(node.left != null) queue.offer(node.left);
+			if(node.right != null) queue.offer(node.right);
+			
+			if (levelSize == 0) { // levelSize == 0意味着即将访问下一层
+				levelSize = queue.size();
+				height++;
+			}
+		}
+		return height;
+	}
+	
+	// 树的高度
+	public int height2() {
+		return height(root);
+	}
+	
+	// 节点的高度，递归实现
+	private int height(Node<E> node) {
+		if (node == null) return 0;
+		
+		return 1 + Math.max(height(node.left), height(node.left));
+	}
+	
+	/**
+	 * 通过visitor来让外界决定如何访问取到的元素
+	 * @author Rin
+	 *
+	 * @param <E>
+	 */
+	public static interface Visitor<E> {
+		void visit(E element);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		toString(root, sb, "");
+		return sb.toString();
+	}
+	
+	// 利用前序遍历来打印
+	private void toString(Node<E> node, StringBuilder sb, String prefix) {
+		if(node == null) return;
+		sb.append(prefix).append("【").append(node.element).append("】").append("\n");
+		toString(node.left, sb, prefix + "【L】");
+		toString(node.right, sb, prefix + "【R】");
+		
 	}
 	
 	private void elementNotNullCheck(E element) {

@@ -2,6 +2,7 @@ package com.mj;
 
 import java.util.Comparator;
 
+import com.mj.BinarySearchTree.Visitor;
 import com.mj.printer.BinaryTrees;
 
 public class Main {
@@ -16,16 +17,27 @@ public class Main {
 		for(int i = 0; i < data.length; i++) {
 			bst.add(data[i]);
 		}
-		
+
 		BinaryTrees.println(bst);
-		bst.preorderTraversal();
-		System.out.println();
-		bst.inorderTraversal();
-		System.out.println();
-		bst.postorderTraversal();
-		System.out.println();
-		bst.levelOrderTraversal();
+		System.out.println(bst.height());
 		
+		bst.levelOrder(new Visitor<Integer>() {
+			@Override
+			public void visit(Integer element) {
+				System.out.print("_" + element + "_");
+			}
+		});
+		
+		System.out.println();
+		
+		bst.inorder(new Visitor<Integer>() {
+			@Override
+			public void visit(Integer element) {
+				System.out.print("_" + element + "_");
+			}
+		});
+		System.out.println();
+		System.out.println(bst);
 		
 		// 利用匿名类创建比较器
 		@SuppressWarnings("unused")
