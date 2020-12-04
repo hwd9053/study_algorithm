@@ -9,23 +9,22 @@ import java.util.Map;
  * @author Rin
  *
  */
-public class _105_从前序与中序遍历序列构造二叉树 {
+public class _105_从前序与中序遍历序列构造二叉树_递归 {
 	
-	public TreeNode buildTree(int[] preorder, int[] inorder, int preLeft, int preRight,
-		int inLeft, int inRight, Map<Integer, Integer> map) {
-		if (preLeft > preRight) return null;
-		int rootVal = preorder[preLeft];
+	public TreeNode buildTree(int[] preorder, int[] inorder, int preStart, int preEnd,
+		int inStart, int inEnd, Map<Integer, Integer> map) {
+		if (preStart > preEnd) return null;
+		int rootVal = preorder[preStart];
 		int rootIndex = map.get(rootVal);
 		
 		TreeNode node = new TreeNode(rootVal);
 		
-		int leftLen = rootIndex - inLeft;
-		//int rightLen = inRight - rootIndex;
+		int leftLen = rootIndex - inStart;
 		
-		node.left = buildTree(preorder, inorder, preLeft + 1, preLeft + leftLen, 
-				inLeft, rootIndex - 1, map);
-		node.right = buildTree(preorder, inorder, preLeft + leftLen + 1, preRight, 
-				rootIndex + 1, inRight, map);
+		node.left = buildTree(preorder, inorder, preStart + 1, preStart + leftLen, 
+				inStart, rootIndex - 1, map);
+		node.right = buildTree(preorder, inorder, preStart + leftLen + 1, preEnd, 
+				rootIndex + 1, inEnd, map);
 		
 		return node;
 	}

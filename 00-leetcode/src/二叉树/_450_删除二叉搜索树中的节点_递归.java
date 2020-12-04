@@ -33,15 +33,16 @@ public class _450_删除二叉搜索树中的节点_递归 {
     		} else { // 度为2
     			TreeNode node = root.right;
     			TreeNode pre = root;
-    			while(node.left != null) {
+    			while(node.left != null) { // 循环过后，node节点为后继节点
     				pre = node;
     				node = node.left;
     			}
     			root.val = node.val;
     			if (pre.left == node) {
-    				pre.left = node.left == null ? node.right : node.left; 
+    				// 后继节点的左一定为空，所以这边直接给右节点。
+    				pre.left = node.right; 
     			} else {
-    				pre.right = node.left == null ? node.right : node.left;
+    				pre.right = node.right;
     			}
     			return root;
     		}
