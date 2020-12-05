@@ -113,7 +113,7 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 			return pre;
 		}
 		
-		// 从祖父节点中寻找前驱结点
+		// 从祖父节点中寻找后继结点
 		// 当父节点不为空且为父节点的右子树的时候，一直循环(为左子节点的父节点是要找的节点)
 		while(node.parent != null && node == node.parent.right) {
 			node = node.parent;

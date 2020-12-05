@@ -31,11 +31,108 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 
 	}
 	
+	// 删除
+	@Override
+	protected void afterRemove(Node<E> node) {
+		while((node = node.parent) != null) {
+			if (isBalance(node)) {
+				// 更新高度
+				updateHeight(node);
+			} else {
+				// 恢复平衡
+				rebalance(node);
+			}
+		}
+	}
+	
 	/**
-	 * 恢复平衡
-	 * @param node 高度最低的不平衡节点
+	 * 统一做法恢复平衡
+	 * @param grand
 	 */
 	private void rebalance(Node<E> grand) {
+		// parent为两颗子树中高的那一颗
+		Node<E> parent = ((AVLNode<E>)grand).tallerChild();
+		// node为两颗子树中高的那一颗
+		Node<E> node = ((AVLNode<E>)parent).tallerChild();
+		
+		// L
+		if (parent.isLeftChild()) {
+			// LL
+			if (node.isLeftChild()) {
+				rotate(grand, node.left, node, node.right, parent, parent.right, grand, grand.right);
+			} else { // LR
+				rotate(grand, parent.left, parent, node.left, node, node.right, grand, grand.right);
+			}
+		} else { // R
+			if (node.isLeftChild()) { // RL
+				rotate(grand, grand.left, grand, node.left, node, node.right, parent, parent.right);
+			} else { // RR
+				rotate(grand, grand.left, grand, parent.left, parent, node.left, node, node.right);
+			}
+			
+		}
+	}
+	
+	/**
+	 * 统一旋转
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param d
+	 * @param e
+	 * @param f
+	 * @param g
+	 */
+	private void rotate(
+			Node<E> r, // 子树的根节点
+			Node<E> a, Node<E> b, Node<E> c,
+			Node<E> d,
+			Node<E> e, Node<E> f, Node<E> g) {
+		// 让d成为这颗子树的根节点
+		d.parent = r.parent;
+		if (r.isLeftChild()) {
+			d.parent.left = d;
+		} else if (r.isRightChild()) {
+			d.parent.right = d;
+		} else {
+			root = d;
+		}
+		
+		// a-b-c
+		b.left = a;
+		b.right = c;
+		
+		if (a != null) a.parent = b;
+		if (c != null) c.parent = b;
+		
+		updateHeight(b);
+		
+		// e-f-g
+		f.left = e;
+		f.right = g;
+		
+		if (e != null) {
+			e.parent = f;
+		}
+		if (g != null) {
+			g.parent = f;
+		}
+		updateHeight(f);
+		
+		// b-d-f
+		d.left = b;
+		d.right = f;
+		b.parent = d;
+		f.parent = d;
+		updateHeight(d);
+	}
+	
+	
+	/**
+	 * 恢复平衡(通过左旋转，右旋转恢复平衡)
+	 * @param node 高度最低的不平衡节点
+	 */
+	private void rebalance2(Node<E> grand) {
 		// parent为两颗子树中高的那一颗
 		Node<E> parent = ((AVLNode<E>)grand).tallerChild();
 		// node为两颗子树中高的那一颗
@@ -68,32 +165,39 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 		grand.right = child;
 		parent.left = grand;
 		
-		// 让parent成为子树的根节点
+		afterRotate(grand, parent, child);
+	}
+	
+	// 右旋转
+	private void rotateRight(Node<E> grand) {
+		Node<E> parent = grand.left;
+		Node<E> child = parent.right;
+		
+		grand.left = child;
+		parent.right = grand;
+		
+		afterRotate(grand, parent, child);
+	}
+	
+	// 更新父节点，更新高度
+	private void afterRotate(Node<E> grand, Node<E> parent, Node<E> child) {
 		parent.parent = grand.parent;
 		if (grand.isLeftChild()) {
 			grand.parent.left = parent;
-		} else if (grand.isRightChild()){
+		} else if (grand.isRightChild()) {
 			grand.parent.right = parent;
-		} else { // grand没有父节点，表示grand原先就是root节点
+		} else {
 			root = parent;
 		}
 		
-		// 更新child的parent
 		if (child != null) {
 			child.parent = grand;
 		}
 		
-		// 更新grand的parent
 		grand.parent = parent;
 		
-		// 更新高度，从高度低的开始更新
 		updateHeight(grand);
 		updateHeight(parent);
-	}
-	
-	// 右旋转
-	private void rotateRight(Node<E> node) {
-		
 	}
 	
 	// 更新传进来的节点的高度
