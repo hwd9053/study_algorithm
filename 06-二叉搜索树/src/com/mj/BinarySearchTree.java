@@ -217,8 +217,7 @@ public class BinarySearchTree<E> implements BinaryTreeInfo{
 	
 	/**
 	 * 非递归实现,利用栈。栈里面存放的是全部的右子节点
-	 * @param node
-	 * @param visitor
+	 * @param visitor 访问器
 	 */
 	public void preorder2(Visitor<E> visitor) {
 		if (root == null || visitor == null) return;
