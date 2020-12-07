@@ -190,7 +190,7 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 				return false;
 			}
 			
-			if(node.hasTwoChildern()) {
+			if(node.hasTwoChildren()) {
 				queue.offer(node.left);
 				queue.offer(node.right);
 			} else if (node.left == null && node.right != null) {
@@ -308,7 +308,7 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 			return (left == null && right == null);
 		}
 		
-		public boolean hasTwoChildern() {
+		public boolean hasTwoChildren() {
 			return (left != null && right != null);
 		}
 		

@@ -56,7 +56,7 @@ public class RBTree<E> extends BinarySearchTree<E>{
 
     private static class RBNode<E> extends Node<E> {
 
-        boolean color;
+        boolean color = RED;
 
         public RBNode(E element, Node<E> parent) {
             super(element, parent);

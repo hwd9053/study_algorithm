@@ -71,7 +71,7 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 	private void remove(Node<E> node) {
 		if (node == null) return;
 		
-		if (node.hasTwoChildern()) { // 度为2的节点
+		if (node.hasTwoChildren()) { // 度为2的节点
 			// 找到后继节点
 			Node<E> successor = successor(node);
 			// 用后继节点的值覆盖要删除节点的值
