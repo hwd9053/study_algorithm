@@ -2,7 +2,7 @@ package com.mj.tree;
 
 import java.util.Comparator;
 
-public class RBTree<E> extends BinarySearchTree<E>{
+public class RBTree<E> extends BBST<E>{
 
     private static final boolean RED = false;
     private static final boolean BLACK = true;
@@ -15,9 +15,60 @@ public class RBTree<E> extends BinarySearchTree<E>{
         super(comparator);
     }
 
+    /**
+     * 节点添加后的处理
+     * @param node 新添加的节点
+     */
     @Override
     protected void afterAdd(Node<E> node) {
-        super.afterAdd(node);
+        Node<E> parent = node.parent;
+
+        // 若添加的节点的父节点为空，则表示该节点为根节点
+        if (parent == null) {
+            black(node);
+            return;
+        }
+
+        // 若父节点是黑色，直接返回不做处理
+        if (isBlack(parent)) return;
+
+        // 叔父节点
+        Node<E> uncle = parent.sibling();
+        // 祖父节点
+        Node<E> grand = red(parent.parent);
+
+        // 叔父节点为红色
+        if (isRed(uncle)) {
+            black(parent);
+            black(uncle);
+            // 祖父节点染成红色后进行上溢。
+            afterAdd(grand);
+            return;
+        }
+
+        // 叔父节点不是红色
+        if (parent.isLeftChild()) { // L
+            if (node.isLeftChild()) { // LL
+                black(parent);
+            } else { // LR
+                black(node);
+                rotateLeft(parent);
+            }
+            rotateRight(grand);
+        } else { // R
+            if (node.isLeftChild()) { // RL
+                black(node);
+                rotateRight(parent);
+            } else { // RR
+                black(parent);
+            }
+            rotateLeft(grand);
+        }
+    }
+
+    @Override
+    protected Node<E> createNode(E element, Node<E> parent) {
+        return new RBNode<>(element, parent);
     }
 
     @Override

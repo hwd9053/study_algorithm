@@ -15,8 +15,6 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 		
 	}
 	
-
-	
 	public void add(E element) {
 		elementNotNullCheck(element);
 		// 添加第一个节点

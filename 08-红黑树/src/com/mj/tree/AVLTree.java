@@ -3,7 +3,7 @@ package com.mj.tree;
 import java.util.Comparator;
 
 @SuppressWarnings("rawtypes")
-public class AVLTree<E> extends BinarySearchTree<E> {
+public class AVLTree<E> extends BBST<E> {
 	
 	public AVLTree() {
 		this(null);
@@ -22,7 +22,7 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 				updateHeight(node);
 			} else {
 				// 恢复平衡
-				rebalance(node);
+				reBalance(node);
 				// 第一个失衡节点恢复平衡后，整棵树也都恢复了平衡，无需继续遍历下去
 				break;
 				
@@ -40,7 +40,7 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 				updateHeight(node);
 			} else {
 				// 恢复平衡
-				rebalance(node);
+				reBalance(node);
 			}
 		}
 	}
@@ -49,7 +49,7 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 	 * 统一做法恢复平衡
 	 * @param grand 祖父节点
 	 */
-	private void rebalance(Node<E> grand) {
+	private void reBalance(Node<E> grand) {
 		// parent为两颗子树中高的那一颗
 		Node<E> parent = ((AVLNode<E>)grand).tallerChild();
 		// node为两颗子树中高的那一颗
@@ -73,57 +73,14 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 		}
 	}
 	
-    // 统一旋转
-	private void rotate(
-			Node<E> r, // 子树的根节点
-			Node<E> a, Node<E> b, Node<E> c,
-			Node<E> d,
-			Node<E> e, Node<E> f, Node<E> g) {
-		// 让d成为这颗子树的根节点
-		d.parent = r.parent;
-		if (r.isLeftChild()) {
-			d.parent.left = d;
-		} else if (r.isRightChild()) {
-			d.parent.right = d;
-		} else {
-			root = d;
-		}
-		
-		// a-b-c
-		b.left = a;
-		b.right = c;
-		
-		if (a != null) a.parent = b;
-		if (c != null) c.parent = b;
-		
-		updateHeight(b);
-		
-		// e-f-g
-		f.left = e;
-		f.right = g;
-		
-		if (e != null) {
-			e.parent = f;
-		}
-		if (g != null) {
-			g.parent = f;
-		}
-		updateHeight(f);
-		
-		// b-d-f
-		d.left = b;
-		d.right = f;
-		b.parent = d;
-		f.parent = d;
-		updateHeight(d);
-	}
+
 	
 	
 	/**
 	 * 恢复平衡(通过左旋转，右旋转恢复平衡)
 	 * @param grand 高度最低的不平衡节点
 	 */
-	private void rebalance2(Node<E> grand) {
+	private void reBalance2(Node<E> grand) {
 		// parent为两颗子树中高的那一颗
 		Node<E> parent = ((AVLNode<E>)grand).tallerChild();
 		// node为两颗子树中高的那一颗
@@ -149,48 +106,7 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 		}
 	}
 	
-	// 左旋转
-	private void rotateLeft(Node<E> grand) {
-		Node<E> parent = grand.right;
-		Node<E> child = parent.left;
-		grand.right = child;
-		parent.left = grand;
-		
-		afterRotate(grand, parent, child);
-	}
-	
-	// 右旋转
-	private void rotateRight(Node<E> grand) {
-		Node<E> parent = grand.left;
-		Node<E> child = parent.right;
-		
-		grand.left = child;
-		parent.right = grand;
-		
-		afterRotate(grand, parent, child);
-	}
-	
-	// 更新父节点，更新高度
-	private void afterRotate(Node<E> grand, Node<E> parent, Node<E> child) {
-		parent.parent = grand.parent;
-		if (grand.isLeftChild()) {
-			grand.parent.left = parent;
-		} else if (grand.isRightChild()) {
-			grand.parent.right = parent;
-		} else { // 不为左也不为右，表示grand的父节点为空
-			root = parent;
-		}
 
-		// child有可能为空
-		if (child != null) {
-			child.parent = grand;
-		}
-		
-		grand.parent = parent;
-		
-		updateHeight(grand);
-		updateHeight(parent);
-	}
 	
 	// 更新传进来的节点的高度
 	private void updateHeight(Node<E> node) {
@@ -207,7 +123,23 @@ public class AVLTree<E> extends BinarySearchTree<E> {
 	private boolean isBalance(Node<E> node) {
 		return Math.abs(((AVLNode<E>)node).balanceFactor()) <= 1;
 	}
-	
+
+	@Override
+	protected void afterRotate(Node<E> grand, Node<E> parent, Node<E> child) {
+		super.afterRotate(grand, parent, child);
+
+		updateHeight(grand);
+		updateHeight(parent);
+	}
+
+	@Override
+	protected void rotate(Node<E> r, Node<E> a, Node<E> b, Node<E> c, Node<E> d, Node<E> e, Node<E> f, Node<E> g) {
+		super.rotate(r, a, b, c, d, e, f, g);
+		updateHeight(b);
+		updateHeight(f);
+		updateHeight(d);
+	}
+
 	private static class AVLNode<E> extends Node<E> {
 		// 每次创建出来的叶子节点，高度都是1
 		int height = 1;
