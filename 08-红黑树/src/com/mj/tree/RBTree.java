@@ -72,8 +72,42 @@ public class RBTree<E> extends BBST<E>{
     }
 
     @Override
-    protected void afterRemove(Node<E> node) {
-        super.afterRemove(node);
+    protected void afterRemove(Node<E> node, Node<E> replacement) {
+        // 若删除的是红色节点，无需做处理，直接返回
+        if (isRed(node)) return;
+
+        // 用以取代node的子节点是红色
+        if (isRed(replacement)) {
+            black(replacement);
+            return;
+        }
+
+        Node<E> parent = node.parent;
+        // 删除的是根节点
+        if (parent == null) return;
+
+        // 删除的是黑色叶子节点
+
+        // 先取得兄弟节点，从兄弟节点的颜色，有无红色子节点开始判断
+        // 判断被删除的node是左还是右
+        boolean left = parent.left == null;
+        Node<E> sibling = left ? parent.right : parent.left;
+
+        // 被删除的节点在左或者右，会影响旋转
+        if (left) { // 被删除的节点在左边
+
+        } else { // 被删除的节点在右边
+            // 先处理兄弟节点为红色的情况。通过旋转，会转变为兄弟节点为黑色的情况
+           if (isRed(sibling)) { // 兄弟节点为红色的情况
+                black(sibling);
+                red(parent);
+                rotateRight(parent);
+                // 更换兄弟
+               sibling = parent.left;
+            }
+           // 兄弟节点为黑色的情况
+
+        }
     }
 
     // 染色

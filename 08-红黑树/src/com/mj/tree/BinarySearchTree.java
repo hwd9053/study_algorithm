@@ -59,8 +59,9 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 	/**
 	 * 删除node之后的调整
 	 * @param node 被删除的节点
+	 * @param replacement 红黑树删除时候需要判定替代的节点颜色，AVL树用不到
 	 */
-	protected void afterRemove(Node<E> node) { }
+	protected void afterRemove(Node<E> node, Node<E> replacement) { }
 	
 	public void remove(E element) {
 		remove(node(element));
@@ -68,7 +69,7 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 	
 	private void remove(Node<E> node) {
 		if (node == null) return;
-		
+
 		if (node.hasTwoChildren()) { // 度为2的节点
 			// 找到后继节点
 			Node<E> successor = successor(node);
@@ -95,12 +96,12 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 			
 			// 度为2的情况下，真正被删除的是，后继或者前驱节点。
 			// 删除节点后的处理
-			afterRemove(node);
+			afterRemove(node, replacement);
 		} else if (node.parent == null) { // node是叶子节点并且是根节点
 			root = null;
 			// 度为2的情况下，真正被删除的是，后继或者前驱节点。
 			// 删除节点后的处理
-			afterRemove(node);
+			afterRemove(node, null);
 		} else { // node是叶子节点但不是根节点
 			if (node == node.parent.left) {
 				node.parent.left = null;
@@ -109,7 +110,7 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 			}
 			// 度为2的情况下，真正被删除的是，后继或者前驱节点。
 			// 删除节点后的处理
-			afterRemove(node);
+			afterRemove(node, null);
 		}
 		
 		size--;
