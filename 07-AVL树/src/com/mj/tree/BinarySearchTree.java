@@ -12,7 +12,7 @@ public class BinarySearchTree<E> extends BinaryTree<E>{
 	}
 	
 	public BinarySearchTree() {
-		
+		this(null);
 	}
 	
 

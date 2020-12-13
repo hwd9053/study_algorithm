@@ -31,10 +31,10 @@ public class LevelOrderPrinter extends Printer {
 	private int minX;
 	private int maxWidth;
 
-	public LevelOrderPrinter(BinaryTreeInfo tree) {
-		super(tree);
+	public LevelOrderPrinter(BinaryTreeInfo com.mj.tree) {
+		super(com.mj.tree);
 
-		root = new Node(tree.root(), tree);
+		root = new Node(com.mj.tree.root(), com.mj.tree);
 		maxWidth = root.width;
 	}
 
@@ -76,7 +76,7 @@ public class LevelOrderPrinter extends Printer {
 	private Node addNode(List<Node> nodes, Object btNode) {
 		Node node = null;
 		if (btNode != null) {
-			node = new Node(btNode, tree);
+			node = new Node(btNode, com.mj.tree);
 			maxWidth = Math.max(maxWidth, node.width);
 			nodes.add(node);
 		} else {
@@ -106,14 +106,14 @@ public class LevelOrderPrinter extends Printer {
 					rowNodes.add(null);
 					rowNodes.add(null);
 				} else {
-					Node left = addNode(rowNodes, tree.left(node.btNode));
+					Node left = addNode(rowNodes, com.mj.tree.left(node.btNode));
 					if (left != null) {
 						node.left = left;
 						left.parent = node;
 						notNull = true;
 					}
 
-					Node right = addNode(rowNodes, tree.right(node.btNode));
+					Node right = addNode(rowNodes, com.mj.tree.right(node.btNode));
 					if (right != null) {
 						node.right = right;
 						right.parent = node;
