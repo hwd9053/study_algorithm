@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * https://leetcode-cn.com/problems/balanced-binary-com.mj.tree/
+ * https://leetcode-cn.com/problems/balanced-binary-tree/
  */
 public class _110_平衡二叉树 {
     // 时间复杂度为O(n*logn)，笨办法。。不要用
