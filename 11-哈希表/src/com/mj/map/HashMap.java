@@ -1,5 +1,9 @@
 package com.mj.map;
 
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Queue;
+
 public class HashMap<K, V> implements Map<K, V> {
 
     private static final boolean RED = false;
@@ -54,8 +58,9 @@ public class HashMap<K, V> implements Map<K, V> {
         Node<K, V> node = root;
         Node<K, V> parent = null;
         int cmp = 0;
+        int h1 = key == null ? 0 : key.hashCode();
         do {
-            cmp = compare(key, node.key);
+            cmp = compare(key, node.key, h1, node.hash);
             parent = node;
             if(cmp > 0) {
                 node = node.right;
@@ -81,27 +86,65 @@ public class HashMap<K, V> implements Map<K, V> {
 
     @Override
     public V get(K key) {
-        return null;
+        Node<K, V> node = node(key);
+        return node == null ? null : node.value;
     }
 
     @Override
     public V remove(K key) {
-        return null;
+        return remove(node(key));
     }
 
     @Override
     public boolean containsKey(K key) {
-        return false;
+        return node(key) != null;
     }
 
     @Override
     public boolean containsValue(V value) {
+        if (size == 0) return false;
+        Queue<Node<K, V>> queue = new LinkedList<>();
+
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] == null) continue;
+
+            queue.offer(table[i]);
+            while (!queue.isEmpty()) {
+                Node<K, V> node = queue.poll();
+                if (Objects.equals(node.value, value)) {
+                    return true;
+                }
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+        }
         return false;
     }
 
     @Override
     public void traversal(Visitor visitor) {
+        if (size == 0 || visitor == null) return;
+        Queue<Node<K, V>> queue = new LinkedList<>();
 
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] == null) continue;
+            queue.offer(table[i]);
+
+            while (!queue.isEmpty()) {
+                Node<K, V> node = queue.poll();
+                if (visitor.visit(node.key, node.value)) return;
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+        }
     }
 
     // 根据key生成对应的索引(在桶数组中的位置)
@@ -109,6 +152,11 @@ public class HashMap<K, V> implements Map<K, V> {
         if (key == null) return 0;
         int hash = key.hashCode();
         return (hash ^ (hash >>> 16)) & (table.length - 1);
+    }
+
+    // 根据key生成对应的索引(在桶数组中的位置)
+    private int index(Node<K, V> node) {
+        return (node.hash ^ (node.hash >>> 16)) & (table.length - 1);
     }
 
     private void afterPut(Node<K, V> node) {
@@ -255,7 +303,7 @@ public class HashMap<K, V> implements Map<K, V> {
         } else if (grand.isRightChild()) {
             grand.parent.right = parent;
         } else { // 不为左也不为右，表示grand的父节点为空
-            root = parent;
+            table[index(grand)] = parent;
         }
 
         // child有可能为空
@@ -300,9 +348,10 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // 查找当前元素，返回所在节点
     private Node<K, V> node(K key) {
-        Node<K, V> node = root;
+        Node<K, V> node = table[index(key)];
         while(node != null) {
-            int cmp = compare(key, node.key);
+            int h1 = key == null ? 0 : key.hashCode();
+            int cmp = compare(key, node.key, h1, node.hash);
             if (cmp == 0) {
                 return node;
             } else if (cmp > 0) {
@@ -365,22 +414,104 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     /**
-     *
-     * @return 返回值等于0，代表e1和e2相等。大于0，代表e1大于e2。小于0，代表e1小于e2
+     * 比较key的大小
+     * @param k1 key1
+     * @param k2 key2
+     * @param h1 key1的hashcode
+     * @param h2 key2的hashcode
+     * @return 大小结果
      */
-    private int compare(K e1, K e2) {
-        return 0;
+    private int compare(K k1, K k2, int h1, int h2) {
+        // 比较hash值
+        int result = h1 - h2;
+        if (result != 0) return result;
+
+        // 比较equals
+        if (Objects.equals(k1, k2)) return 0;
+
+        // hash相等，但是equals不相等
+        if (k1 != null && k2 != null) {
+            // 比较类名
+            String k1Cls = k1.getClass().getName();
+            String k2Cls = k2.getClass().getName();
+            result = k1Cls.compareTo(k2Cls);
+            if (result != 0) return result;
+
+            // 同一种类型并且具备可比较性
+            if (k1 instanceof Comparable) {
+                return ((Comparable) k1).compareTo(k2);
+            }
+        }
+        // 哈希值相同，同一种类型，equals结果又不想等，且不具备可比较性
+        // k1为null,k2不为null
+        // k1不为null,k2为null
+        // 此时利用内存地址的哈希值直接比较
+        return System.identityHashCode(k1) - System.identityHashCode(k2);
+    }
+
+    public V remove(Node<K, V> node) {
+        if (node == null) return null;
+
+        V oldValue = node.value;
+
+        if (node.hasTwoChildren()) { // 度为2的节点
+            // 找到后继节点
+            Node<K, V> successor = successor(node);
+            // 用后继节点的值覆盖要删除节点的值
+            node.key = successor.key;
+            node.value = successor.value;
+            // 删除后继节点(让if外面的代码去删)
+            node = successor;
+        }
+
+        int index = index(node);
+
+        // 删除node节点(此时节点的度必然是0或者1)
+        Node<K, V> replacement = node.left == null ? node.right : node.left;
+        // replacement为空，表示node节点度为0
+        if (replacement != null) { // 度为1
+            // 更改parent
+            replacement.parent = node.parent;
+
+            if (node.parent == null) { // node是度为1的节点并且是根节点
+                table[index] = replacement;
+            } else if (node == node.parent.right) {
+                node.parent.right = replacement;
+            } else {
+                node.parent.left = replacement;
+            }
+
+            // 度为2的情况下，真正被删除的是，后继或者前驱节点。
+            // 删除节点后的处理
+            afterRemove(replacement);
+        } else if (node.parent == null) { // node是叶子节点并且是根节点
+            table[index] = null;
+        } else { // node是叶子节点但不是根节点
+            if (node == node.parent.left) {
+                node.parent.left = null;
+            } else {
+                node.parent.right = null;
+            }
+            // 度为2的情况下，真正被删除的是，后继或者前驱节点。
+            // 删除节点后的处理
+            afterRemove(node);
+        }
+
+        size--;
+        return oldValue;
     }
     
     public static class Node<K, V> {
         K key;
         V value;
+        int hash;
         boolean color = RED;
         Node<K, V> left;
         Node<K, V> right;
         Node<K, V> parent;
         public Node(K key, V value, Node<K, V> parent) {
             this.key = key;
+            this.hash = key == null ? 0 : key.hashCode();
             this.value = value;
             this.parent = parent;
         }
