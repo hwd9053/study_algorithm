@@ -58,10 +58,38 @@ public class HashMap<K, V> implements Map<K, V> {
         Node<K, V> node = root;
         Node<K, V> parent = null;
         int cmp = 0;
-        int h1 = key == null ? 0 : key.hashCode();
+        K k1 = key;
+        int h1 = k1 == null ? 0 : k1.hashCode();
+        Node<K, V> result = null;
+        boolean searched = false;
         do {
-            cmp = compare(key, node.key, h1, node.hash);
             parent = node;
+            K k2 = node.key;
+            int h2 = node.hash;
+            if (h1 > h2) {
+                cmp = 1;
+            } else if (h1 < h2) {
+                cmp = -1;
+            } else if (Objects.equals(k1, k2)) {
+                cmp = 0;
+            } else if (k1 != null && k2 != null
+                    && k1.getClass() == k2.getClass()
+                    && k1 instanceof Comparable
+                    && (cmp = ((Comparable) k1).compareTo(k2)) != 0) {
+                    // compareTo的结果若为0，则单纯表示两对象的大小相同，但无法表示两对象相同
+            } else if (searched) { // 已经进行过了扫描，但是没找到。所以直接比较内存地址就可以了
+                cmp = System.identityHashCode(k1) - System.identityHashCode(k2);
+            } else { // 能来到这，表示还未扫描。先扫描，排除有重复的元素，再根据内存地址决定大小。
+                if ((node.left != null && (result = node(node.left, k1)) != null)
+                        || (node.right != null && (result = node(node.right, k1)) != null)) { // 在左,右子树中存在该节点
+                    node = result;
+                    cmp = 0;
+                } else { // 扫描后发现不存在该key，通过内存地址的hash值进行添加
+                    searched = true; // 对一棵红黑树的扫描，只需要进行一次
+                    cmp = System.identityHashCode(k1) - System.identityHashCode(k2);
+                }
+            }
+
             if(cmp > 0) {
                 node = node.right;
             } else if(cmp < 0) {
@@ -346,19 +374,61 @@ public class HashMap<K, V> implements Map<K, V> {
         }
     }
 
-    // 查找当前元素，返回所在节点
-    private Node<K, V> node(K key) {
-        Node<K, V> node = table[index(key)];
-        while(node != null) {
-            int h1 = key == null ? 0 : key.hashCode();
-            int cmp = compare(key, node.key, h1, node.hash);
-            if (cmp == 0) {
-                return node;
-            } else if (cmp > 0) {
+//    // 查找当前元素，返回所在节点
+//    private Node<K, V> node(K key) {
+//        Node<K, V> node = table[index(key)];
+//        int h1 = key == null ? 0 : key.hashCode();
+//        while(node != null) {
+//            int cmp = compare(key, node.key, h1, node.hash);
+//            if (cmp == 0) {
+//                return node;
+//            } else if (cmp > 0) {
+//                node = node.right;
+//            } else { // cmp < 0
+//                node = node.left;
+//            }
+//        }
+//        return null;
+//    }
+
+    // 查找当前key，返回所在节点
+    private Node<K, V> node(K k1) {
+        Node<K, V> root = table[index(k1)];
+        return root == null ? null : node(root, k1);
+    }
+
+    // 在当前节点中查找节点(递归)
+    private Node<K, V> node(Node<K, V> node ,K k1) {
+        int h1 = k1 == null ? 0 : k1.hashCode();
+        // 存储查找结果
+        Node<K, V> result = null;
+        int cmp = 0;
+        while (node != null) {
+            K k2 = node.key;
+            int h2 = node.hash;
+            // 先比较哈希值，决定往左往右
+            if (h1 > h2) {
                 node = node.right;
-            } else { // cmp < 0
+            } else if (h1 < h2) {
                 node = node.left;
+            } else if (Objects.equals(k1, k2)) {
+                return node;
+            } else if (k1 != null && k2 != null
+                    && k1.getClass() == k2.getClass()
+                    && k1 instanceof Comparable
+                    && (cmp = ((Comparable) k1).compareTo(k2)) != 0){ // 判断是否是相同类型，是否有可比较性。且cmp为0的时候，无法表示两对象相等
+                node = cmp > 0 ? node.right : node.left;
+            // 哈希值相等，不具备可比较性(也有可能是空)，也不equals
+            } else if (node.right != null && (result = node(node.right, k1)) != null) { // 去右子树找
+                return result;
+            } else {
+                node = node.left; // 进行了优化，减少了递归调用次数
             }
+//            else if (node.left != null && (result = node(node.left, k1)) != null) { // 去左子树找
+//                return result;
+//            } else {
+//                return null;
+//            }
         }
         return null;
     }
@@ -430,17 +500,10 @@ public class HashMap<K, V> implements Map<K, V> {
         if (Objects.equals(k1, k2)) return 0;
 
         // hash相等，但是equals不相等
-        if (k1 != null && k2 != null) {
-            // 比较类名
-            String k1Cls = k1.getClass().getName();
-            String k2Cls = k2.getClass().getName();
-            result = k1Cls.compareTo(k2Cls);
-            if (result != 0) return result;
-
-            // 同一种类型并且具备可比较性
-            if (k1 instanceof Comparable) {
-                return ((Comparable) k1).compareTo(k2);
-            }
+        if (k1 != null && k2 != null
+                && k1.getClass() == k2.getClass()
+                && k1 instanceof Comparable) {
+            return ((Comparable)k1).compareTo(k2);
         }
         // 哈希值相同，同一种类型，equals结果又不想等，且不具备可比较性
         // k1为null,k2不为null
@@ -460,6 +523,7 @@ public class HashMap<K, V> implements Map<K, V> {
             // 用后继节点的值覆盖要删除节点的值
             node.key = successor.key;
             node.value = successor.value;
+            node.hash = successor.hash;
             // 删除后继节点(让if外面的代码去删)
             node = successor;
         }
