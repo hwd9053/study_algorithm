@@ -11,6 +11,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private int size;
     private Node<K, V>[] table;
     private static final int DEFAULT_CAPACITY = 1 << 4;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     public HashMap() {
         table = new Node[DEFAULT_CAPACITY];
@@ -43,6 +44,7 @@ public class HashMap<K, V> implements Map<K, V> {
      */
     @Override
     public V put(K key, V value) {
+        resize();
         int index = index(key);
         // 取出index位置的红黑树根节点
         Node<K, V> root = table[index];
@@ -59,7 +61,7 @@ public class HashMap<K, V> implements Map<K, V> {
         Node<K, V> parent = null;
         int cmp = 0;
         K k1 = key;
-        int h1 = k1 == null ? 0 : k1.hashCode();
+        int h1 = hash(k1);
         Node<K, V> result = null;
         boolean searched = false;
         do {
@@ -175,16 +177,103 @@ public class HashMap<K, V> implements Map<K, V> {
         }
     }
 
+    // 扩容
+    private void resize() {
+        if (size / table.length <= DEFAULT_LOAD_FACTOR) return;
+        Node<K, V>[] oldTable = table;
+        table = new Node[oldTable.length << 1];
+
+        Queue<Node<K, V>> queue = new LinkedList<>();
+
+        for (int i = 0; i < oldTable.length; i++) {
+            if (oldTable[i] == null) continue;
+
+            queue.offer(oldTable[i]);
+            while (!queue.isEmpty()) {
+                Node<K, V> node = queue.poll();
+
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+                // 挪动代码的时候会清空节点的父左右，所以需要放在入队之后执行
+                moveNode(node);
+            }
+        }
+    }
+
+    private void moveNode(Node<K, V> newNode) {
+        newNode.parent = null;
+        newNode.left = null;
+        newNode.right = null;
+        newNode.color = RED;
+        int index = index(newNode);
+        // 取出index位置的红黑树根节点
+        Node<K, V> root = table[index];
+        if (root == null) {
+            root = newNode;
+            table[index] = root;
+            afterPut(root);
+            return;
+        }
+
+        // 添加新的节点到红黑树(哈希冲突)
+        Node<K, V> node = root;
+        Node<K, V> parent = null;
+        int cmp = 0;
+        K k1 = newNode.key;
+        int h1 = newNode.hash;
+
+        do {
+            parent = node;
+            K k2 = node.key;
+            int h2 = node.hash;
+            if (h1 > h2) {
+                cmp = 1;
+            } else if (h1 < h2) {
+                cmp = -1;
+            } else if (k1 != null && k2 != null
+                    && k1.getClass() == k2.getClass()
+                    && k1 instanceof Comparable
+                    && (cmp = ((Comparable) k1).compareTo(k2)) != 0) {
+                // compareTo的结果若为0，则单纯表示两对象的大小相同，但无法表示两对象相同
+            } else { // 因为是挪动旧map中的元素到新map中，而旧map中肯定不会存在相等的元素，所以equals跟扫描处理不需要
+                    cmp = System.identityHashCode(k1) - System.identityHashCode(k2);
+            }
+
+            if(cmp > 0) {
+                node = node.right;
+            } else if(cmp < 0) {
+                node = node.left;
+            }
+        } while(node != null);
+
+        if(cmp > 0) {
+            parent.right = newNode;
+        } else {
+            parent.left = newNode;
+        }
+        newNode.parent = parent;
+        afterPut(newNode);
+    }
+
     // 根据key生成对应的索引(在桶数组中的位置)
     private int index(K key) {
+        return hash(key) & (table.length - 1);
+    }
+
+    // 扰动计算
+    private int hash(K key) {
         if (key == null) return 0;
         int hash = key.hashCode();
-        return (hash ^ (hash >>> 16)) & (table.length - 1);
+        return (hash ^ (hash >>> 16));
     }
 
     // 根据key生成对应的索引(在桶数组中的位置)
     private int index(Node<K, V> node) {
-        return (node.hash ^ (node.hash >>> 16)) & (table.length - 1);
+        return node.hash & (table.length - 1);
     }
 
     private void afterPut(Node<K, V> node) {
@@ -399,7 +488,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // 在当前节点中查找节点(递归)
     private Node<K, V> node(Node<K, V> node ,K k1) {
-        int h1 = k1 == null ? 0 : k1.hashCode();
+        int h1 = hash(k1);
         // 存储查找结果
         Node<K, V> result = null;
         int cmp = 0;
@@ -575,7 +664,8 @@ public class HashMap<K, V> implements Map<K, V> {
         Node<K, V> parent;
         public Node(K key, V value, Node<K, V> parent) {
             this.key = key;
-            this.hash = key == null ? 0 : key.hashCode();
+            int hash = key == null ? 0 : key.hashCode();
+            this.hash = hash ^ (hash >>> 16);
             this.value = value;
             this.parent = parent;
         }
