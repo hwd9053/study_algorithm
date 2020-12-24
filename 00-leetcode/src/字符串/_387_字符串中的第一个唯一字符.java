@@ -34,16 +34,17 @@ public class _387_字符串中的第一个唯一字符 {
 
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            Integer count = map.get(c);
-            if (map.get(c) != null) {
-                map.put(c, ++count);
+            if (map.get(s.charAt(i)) != null) {
+                map.put(c, -1);
             } else {
-                map.put(c, 1);
+                map.put(c, i);
             }
         }
 
-
-
+        for (int i = 0; i < s.length(); i++) {
+            int index = 0;
+            if ((index = map.get(s.charAt(i))) != -1) return index;
+        }
         return -1;
     }
 }
