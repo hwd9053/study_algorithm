@@ -21,26 +21,30 @@ public class _145_二叉树的后序遍历 {
         return list;
     }
 
-//    // 后序遍历的迭代解
-//    // 用栈模拟后续遍历的顺序
-//    public List<Integer> postorderTraversal2(TreeNode root) {
-//        List<Integer> list = new ArrayList<>();
-//        if (root == null) return list;
-//        Stack<TreeNode> stack = new Stack<>();
-//
-//        while (root != null) {
-//            list.add(root.val);
-//            if (root.right != null) {
-//                stack.push(root.right);
-//            }
-//            if (root.left != null) {
-//                root = root.left;
-//            } else if (!stack.isEmpty()){
-//                root = stack.pop();
-//            } else {
-//                root = null;
-//            }
-//        }
-//        return list;
-//    }
+    // 后序遍历的迭代解
+    public List<Integer> postorderTraversal2(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        if (root == null) return list;
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+        TreeNode prev = null;
+
+        while(!stack.isEmpty()) {
+            TreeNode top = stack.peek();
+
+            if ((top.left == null && top.right == null)
+                    || (prev != null && (top.left == prev || top.right == prev))) {
+                prev = stack.pop();
+                list.add(prev.val);
+            } else {
+                if (top.right != null) {
+                    stack.push(top.right);
+                }
+                if (top.left != null) {
+                    stack.push(top.left);
+                }
+            }
+        }
+        return list;
+    }
 }

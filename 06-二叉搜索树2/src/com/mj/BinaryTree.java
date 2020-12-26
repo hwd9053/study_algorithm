@@ -44,8 +44,7 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 	
 	/**
 	 * 非递归实现,利用栈。栈里面存放的是全部的右子节点
-	 * @param node
-	 * @param visitor
+	 * @param visitor 访问器
 	 */
 	public void preorder2(Visitor<E> visitor) {
 		if (root == null || visitor == null) return;
@@ -63,9 +62,28 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 			} else if (stack.isEmpty()){
 				return;
 			} else {
+				// 处理右子节点
 				node = stack.pop();
 			}
+		}
+	}
 
+	// 迭代实现的第二种做法。利用栈。类似层序遍历
+	public void preorder3(Visitor<E> visitor) {
+		if (root == null || visitor == null) return;
+		Stack<Node<E>> stack = new Stack<>();
+		stack.push(root);
+
+		while(!stack.isEmpty()) {
+			Node<E> node = stack.pop();
+			visitor.visit(node.element);
+
+			if (node.right != null) {
+				stack.push(node.right);
+			}
+			if (node.left != null) {
+				stack.push(node.left);
+			}
 		}
 	}
 	
@@ -139,6 +157,28 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 		visitor.visit(node.element);
 		inorder(node.right, visitor);
 	}
+
+	// 中序遍历，迭代实现
+	// 思想为，利用栈。栈中保存所有的左子节点。
+	public void inorder2(Visitor<E> visitor) {
+		if (root == null || visitor == null) return;
+		Node<E> node = root;
+		Stack<Node<E>> stack = new Stack<>();
+
+		while (true) {
+			if (node != null) {
+				stack.push(node);
+				node = node.left;
+			} else if (stack.isEmpty()) {
+				return;
+			} else {
+				node = stack.pop();
+				visitor.visit(node.element);
+				// 让右子节点进行中序遍历
+				node = node.right;
+			}
+		}
+	}
 	
 	/**
 	 * 后序遍历(根结点在最后)
@@ -155,6 +195,29 @@ public class BinaryTree<E> implements BinaryTreeInfo {
 		postorder(node.left, visitor);
 		postorder(node.right, visitor);
 		visitor.visit(node.element);
+	}
+
+	// 后序遍历，迭代实现
+	public void postorder2(Visitor<E> visitor) {
+		if (visitor == null || root == null) return;
+		Stack<Node<E>> stack = new Stack<>();
+		Node<E> prev = null;
+		stack.push(root);
+		while(!stack.isEmpty()) {
+			Node<E> top = stack.peek();
+
+			if (top.isLeaf() || (prev != null && prev.parent == top)) {
+				prev = stack.pop();
+				visitor.visit(prev.element);
+			} else {
+				if (top.right != null) {
+					stack.push(top.right);
+				}
+				if (top.left != null) {
+					stack.push(top.left);
+				}
+			}
+		}
 	}
 	
 	/**
