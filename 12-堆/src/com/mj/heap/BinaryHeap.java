@@ -89,9 +89,9 @@ public class BinaryHeap<E> extends AbstractHeap<E> {
     // 批量建堆
     private void heapify() {
         // 自上而下的上滤,O(n*logn)
-        for (int i = 1; i < size; i++) {
-            siftUp(i);
-        }
+//        for (int i = 1; i < size; i++) {
+//            siftUp(i);
+//        }
 
         // 自下而上的下滤，时间复杂度为O(n)
         for (int i = (size >> 1) - 1; i >= 0; i--) {
