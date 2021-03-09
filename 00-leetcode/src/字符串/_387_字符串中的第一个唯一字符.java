@@ -47,4 +47,19 @@ public class _387_字符串中的第一个唯一字符 {
         }
         return -1;
     }
+
+    public int firstUniqChar3(String s) {
+        int[] nums = new int[26];
+        int len = s.length();
+
+        for (int i = 0; i < len; i++) {
+            nums[s.charAt(i) - 'a']++;
+        }
+
+        for (int i = 0; i < len; i++) {
+            if (nums[s.charAt(i) - 'a'] == 1) return i;
+        }
+
+        return -1;
+    }
 }
