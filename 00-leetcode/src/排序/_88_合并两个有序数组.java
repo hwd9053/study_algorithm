@@ -48,4 +48,18 @@ public class _88_合并两个有序数组 {
             }
         }
     }
+
+    public void merge3(int[] nums1, int m, int[] nums2, int n) {
+        int index = m + n - 1;
+        int nums1Begin = m - 1;
+        int nums2Begin = n - 1;
+
+        while (nums2Begin >= 0) {
+            if (nums1Begin >= 0 && nums1[nums1Begin] > nums2[nums2Begin]) {
+                nums1[index--] = nums1[nums1Begin--];
+            } else {
+                nums1[index--] = nums2[nums2Begin--];
+            }
+        }
+    }
 }
