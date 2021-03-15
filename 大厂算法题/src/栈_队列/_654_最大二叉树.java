@@ -2,6 +2,9 @@ package 栈_队列;
 
 import common.TreeNode;
 
+import java.util.Arrays;
+import java.util.Stack;
+
 /**
  * https://leetcode-cn.com/problems/maximum-binary-tree/
  */
@@ -27,7 +30,53 @@ public class _654_最大二叉树 {
 
     // 要求返回一个数组，里面存放着原数组元素对应的父节点的索引
     public int[] parentIndexes(int[] nums) {
+        if (nums == null || nums.length == 0) return null;
+        /*
+         * 1.扫描一遍所有元素
+         * 2.保持栈从栈底到栈顶是单调递减的
+         */
+        int[] lis = new int[nums.length];
+        int[] ris = new int[nums.length];
+        Stack<Integer> stack = new Stack<>();
 
-        return null;
+        // 初始化
+        for (int i = 0; i < nums.length; i++) {
+            lis[i] = -1;
+            ris[i] = -1;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
+                ris[stack.pop()] = i;
+            }
+            if (!stack.isEmpty()) {
+                lis[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+        int[] pis = new int[nums.length];
+
+        for (int i = 0; i < nums.length; i++) {
+            if (lis[i] == -1 && ris[i] == -1) {
+                // i位置的是根节点
+                pis[i] = -1;
+                continue;
+            }
+            if (lis[i] == -1) {
+                pis[i] = ris[i];
+            } else if (ris[i] == -1) {
+                pis[i] = lis[i];
+            } else if (nums[lis[i]] < nums[ris[i]]) {
+                pis[i] = lis[i];
+            } else {
+                pis[i] = ris[i];
+            }
+        }
+        return pis;
+    }
+
+    public static void main(String[] args) {
+        _654_最大二叉树 test = new _654_最大二叉树();
+        int[] nums = new int[] {3, 2, 1, 6, 0, 5};
+        System.out.println(Arrays.toString(test.parentIndexes(nums)));
     }
 }
