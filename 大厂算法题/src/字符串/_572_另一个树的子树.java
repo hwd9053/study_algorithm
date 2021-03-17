@@ -22,12 +22,17 @@ public class _572_另一个树的子树 {
     }
 
     private void postSerialize(TreeNode node, StringBuilder sb) {
-        if (node == null) {
+
+        if (node.left == null) {
             sb.append("#!");
-            return;
+        } else {
+            postSerialize(node.left, sb);
         }
-        postSerialize(node.left, sb);
-        postSerialize(node.right, sb);
+        if (node.right == null) {
+            sb.append("#!");
+        } else {
+            postSerialize(node.right, sb);
+        }
 
         sb.append(node.val).append("!");
     }
