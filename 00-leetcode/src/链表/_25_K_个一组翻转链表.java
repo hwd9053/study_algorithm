@@ -52,7 +52,35 @@ public class _25_K_个一组翻转链表 {
         }
     }
 
-    // TODO 头插法
+    // 头插法
+    public ListNode reverseKGroup2(ListNode head, int k) {
+        if (k == 1 || head == null || head.next == null) return head;
+        ListNode dummyHead = new ListNode(0);
+        dummyHead.next = head;
+        ListNode prev = dummyHead;
+        ListNode tail = prev.next;
+
+        while (prev.next != null) {
+            for (int i = 0; i < k - 1 && tail != null; i++) {
+                tail = tail.next;
+            }
+            if (tail == null) break;
+            tail = prev.next;
+            ListNode cur = tail.next;
+            for(int i = 0; i < k - 1; i++) {
+                ListNode next = cur.next;
+                cur.next = prev.next;
+                prev.next = cur;
+                tail.next = next;
+                cur = next;
+            }
+
+            // 重新给节点赋值
+            prev = tail;
+            tail = prev.next;
+        }
+        return dummyHead.next;
+    }
     // TODO 尾插法
 
     public static void main(String[] args) {
