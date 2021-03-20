@@ -8,10 +8,6 @@ public class _64_最小路径和 {
     public int minPathSum(int[][] grid) {
         int rowLen = grid.length;
         int colLen = grid[0].length;
-//        if (rowLen < colLen) {
-//            rowLen = grid[0].length;
-//            colLen = grid.length;
-//        }
         int[] dp = new int[colLen];
 
         dp[0] = grid[0][0];
