@@ -99,7 +99,7 @@ public class _5_最长回文子串 {
     }
 
     // 扩展中心
-    public String longestPalindrome4(String s) {
+    public String longestPalindromeEx(String s) {
         char[] cs = s.toCharArray();
         if (cs.length < 2) return s;
         // 最长回文子串的长度（至少是1）
@@ -136,6 +136,39 @@ public class _5_最长回文子串 {
         }
         // r - l + 1 - 2
         return r - l - 1;
+    }
+
+    // 扩展中心法的优化，基于连续的相同的子串作为扩展中心
+    public String longestPalindromeEx2(String s) {
+        char[] cs = s.toCharArray();
+        if (cs.length < 2) return s;
+        // 最长回文子串的长度（至少是1）
+        int maxLen = 1;
+        // 最长回文子串的开始索引
+        int begin = 0;
+        int i = 0;
+
+        while (i < cs.length - 1) {
+            int l = i - 1;
+            // 找到右边第一个跟cs[i]不相等的位置
+            int r = i;
+            while (++r < cs.length && cs[i] == cs[r]);
+            // r会成为新的i
+            i = r;
+
+            // 向左向右扩展
+            while (l >= 0 && r < cs.length && cs[l] == cs[r]) {
+                l--;
+                r++;
+            }
+            int len = r - l - 1;
+            if (maxLen < len) {
+                maxLen = len;
+                begin = l + 1;
+            }
+        }
+
+        return new String(cs, begin, maxLen);
     }
 
 }
