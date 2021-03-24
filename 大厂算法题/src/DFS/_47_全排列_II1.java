@@ -1,6 +1,7 @@
 package DFS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class _47_全排列_II1 {
         if (nums.length == 0) return list;
 
         result = new int[nums.length];
+        Arrays.sort(nums);
         this.nums = nums;
         used = new boolean[nums.length];
 
@@ -40,7 +42,8 @@ public class _47_全排列_II1 {
 
         // 枚举这一层所有可以做出的选择
         for (int i = 0; i < nums.length; i++) {
-            if (used[i] || result[idx] == nums[i]) continue;
+            if (used[i]) continue;
+            if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]) continue;
             result[idx] = nums[i];
             used[i] = true;
             dfs(idx + 1);
