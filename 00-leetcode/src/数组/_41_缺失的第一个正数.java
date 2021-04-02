@@ -28,6 +28,7 @@ public class _41_缺失的第一个正数 {
             //                0, 1, 2, 3, 4 ...
             // 将1放置在0这个位置，2放置在1这个位置
             // 即，将nums[i]这个值 放置在nums[i] - 1这个索引
+            // 可以交换的nums[i]取值范围[1, nums.length]
             while (nums[i] > 0 && nums[i] <= nums.length && nums[i] != nums[nums[i] - 1]) {
                 // 对i位置的元素和(nums[i] - 1)位置的元素做交换(因为i位置的元素，应该放置到(nums[i] - 1)这个位置)
                 // 如果i位置的元素已经和(nums[i] - 1)位置的元素相等了，那么无需交换
