@@ -1,5 +1,7 @@
 package 高频题;
 
+import java.util.Stack;
+
 public class _42_接雨水 {
     // 求每根柱子能装多少水。每根柱子能装的水，
     // 取决于该柱子左边最高的柱子与右边最高的柱子的最小值，以及该柱子自身的高度
@@ -61,6 +63,7 @@ public class _42_接雨水 {
     }
 
     // 空间复杂度O(1),时间复杂度O(n)的优化
+    // 当前柱子能接到的雨水，只与左右最高柱子中较低的那根柱子的高度有关系。根本不需要知道高的柱子是谁，高度是多少！
     public int trap3(int[] height) {
         if (height == null || height.length == 0) return 0;
 
@@ -105,5 +108,25 @@ public class _42_接雨水 {
         return water;
     }
 
-    // 单调栈，TODO
+    // 单调栈
+    // https://leetcode-cn.com/problems/trapping-rain-water/solution/trapping-rain-water-by-ikaruga/
+    public int trap5(int[] height) {
+        Stack<Integer> stack = new Stack<>();
+        int water = 0;
+        for (int i = 0; i < height.length; i++) {
+            while (!stack.isEmpty() && height[stack.peek()] < height[i]) {
+                // cur:当前要计算水量的柱子
+                // i:cur右边的柱子(高度大于cur)
+                // left:cur左边的柱子(高度大于等于cur)
+                int cur = stack.pop();
+                // 若没有左边柱子，则水量为0，跳出
+                if (stack.isEmpty()) break;
+                int left = stack.peek();
+                int h = Math.min(height[left], height[i]) - height[cur];
+                water += h * (i - left - 1);
+            }
+            stack.push(i);
+        }
+        return water;
+    }
 }
