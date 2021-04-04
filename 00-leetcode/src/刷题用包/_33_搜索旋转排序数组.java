@@ -5,15 +5,14 @@ public class _33_搜索旋转排序数组 {
         int begin = 0, end = nums.length;
         while (begin < end) {
             int mid = (begin + end) >> 1;
-            if (target == nums[mid]) return mid;
-            // 前半有序
+            if (nums[mid] == target) return mid;
             if (nums[begin] <= nums[mid]) {
                 if (target >= nums[begin] && target < nums[mid]) {
                     end = mid;
                 } else {
                     begin = mid + 1;
                 }
-            } else { // 后半有序
+            } else {
                 if (target > nums[mid] && target <= nums[end - 1]) {
                     begin = mid + 1;
                 } else {

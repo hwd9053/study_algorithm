@@ -48,15 +48,11 @@ public class _210_课程表_II {
         int[] inDegrees = new int[numCourses]; // 每个元素的入度
         Queue<Integer> queue = new LinkedList<>();
         Map<Integer, List<Integer>> predecessor = new HashMap<>(); // key为前驱，value为前驱对应的所有后继
-        for (int i = 0; i < prerequisites.length; i++) {
-            inDegrees[prerequisites[i][0]]++;
-            if (predecessor.containsKey(prerequisites[i][1])) {
-                predecessor.get(prerequisites[i][1]).add(prerequisites[i][0]);
-            } else {
-                List<Integer> list = new ArrayList<>();
-                list.add(prerequisites[i][0]);
-                predecessor.put(prerequisites[i][1], list);
-            }
+        for (int[] prerequisite : prerequisites) {
+            inDegrees[prerequisite[0]]++;
+            List<Integer> list = predecessor.getOrDefault(prerequisite[1], new ArrayList<>());
+            list.add(prerequisite[0]);
+            predecessor.put(prerequisite[1], list);
         }
 
         for (int i = 0; i < numCourses; i++) {

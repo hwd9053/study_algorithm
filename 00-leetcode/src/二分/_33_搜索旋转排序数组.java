@@ -1,4 +1,4 @@
-package 数组;
+package 二分;
 
 /**
  * https://leetcode-cn.com/problems/search-in-rotated-sorted-array/
