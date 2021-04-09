@@ -1,4 +1,4 @@
-package 排序;
+package 数组;
 
 /**
  * https://leetcode-cn.com/problems/merge-sorted-array/

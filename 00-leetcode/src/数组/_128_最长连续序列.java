@@ -42,18 +42,18 @@ public class _128_最长连续序列 {
         for (int num : nums) {
             // 若元素重复，跳过，不然会出错
             if (map.containsKey(num)) continue;
-            //找到以左边数字结尾的最长序列，默认为 0
+            // 找到以左边数字结尾的最长序列，默认为 0
             int left = map.getOrDefault(num - 1, 0);
-            //找到以右边数开头的最长序列，默认为 0
+            // 找到以右边数开头的最长序列，默认为 0
             int right = map.getOrDefault(num + 1, 0);
             int curLen = left + right + 1;
             ans = Math.max(ans, curLen);
 
-            //将当前数字放到 map 中，防止重复考虑数字，value 可以随便给一个值
+            // 将当前数字放到 map 中，防止重复考虑数字，value 可以随便给一个值
             map.put(num, 0);
-            //更新左边界长度
+            // 更新左边界长度
             map.put(num - left, curLen);
-            //更新右边界长度
+            // 更新右边界长度
             map.put(num + right, curLen);
         }
         return ans;
