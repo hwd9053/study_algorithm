@@ -19,8 +19,10 @@ public class _236_二叉树的最近公共祖先 {
         TreeNode left = lowestCommonAncestor(root.left, p, q);
         TreeNode right = lowestCommonAncestor(root.right, p, q);
         // ③、④的情况
+        // 左右都有命中，表明根节点就是要找的最近公共祖先
         if (left != null && right != null) return root;
 
+        // 表明只有左或者右命中，另外一边是空的,或者两边都没有命中。
         return left == null ? right : left;
     }
 }
