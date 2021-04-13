@@ -37,10 +37,12 @@ public class _128_最长连续序列 {
     // 需要注意，重复元素不可以进行重复计算，会把值弄错
     // https://leetcode-cn.com/problems/longest-consecutive-sequence/solution/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-by-3-4/
     public int longestConsecutive2(int[] nums) {
-        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> map = new HashMap<>();
         int ans = 0;
         for (int num : nums) {
             // 若元素重复，跳过，不然会出错
+            //比如 [1 2 1]
+            //最后的 1 如果不跳过，因为之前的 2 的最长长度已经更新成 2 了，所以会出错
             if (map.containsKey(num)) continue;
             // 找到以左边数字结尾的最长序列，默认为 0
             int left = map.getOrDefault(num - 1, 0);
