@@ -56,7 +56,7 @@ public class _215_数组中的第K个最大元素 {
         nums[index] = tmp;
     }
 
-    // 利用堆排序
+    // 维持k个元素的小顶堆
     public int findKthLargest2(int[] nums, int k) {
         Queue<Integer> queue = new PriorityQueue<>(k);
 
