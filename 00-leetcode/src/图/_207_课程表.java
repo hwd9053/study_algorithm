@@ -38,4 +38,38 @@ public class _207_课程表 {
         }
         return idx == numCourses;
     }
+
+    // 用list代替map
+    public boolean canFinish2(int numCourses, int[][] prerequisites) {
+        int[] inDegree = new int[numCourses];
+        List<List<Integer>> successors = new ArrayList<>();
+
+        for (int i = 0; i < numCourses; i++) {
+            successors.add(new ArrayList<>());
+        }
+
+        for (int[] prerequisite : prerequisites) {
+            inDegree[prerequisite[0]]++;
+            successors.get(prerequisite[1]).add(prerequisite[0]);
+        }
+
+        Queue<Integer> queue = new LinkedList<>();
+
+        for (int i = 0; i < inDegree.length; i++) {
+            if (inDegree[i] == 0) queue.offer(i);
+        }
+
+        int courses = 0;
+        while (!queue.isEmpty()) {
+            int predecessor = queue.poll();
+            courses++;
+            List<Integer> successor = successors.get(predecessor);
+            for (Integer integer : successor) {
+                if (--inDegree[integer] == 0) {
+                    queue.offer(integer);
+                }
+            }
+        }
+        return courses == numCourses;
+    }
 }

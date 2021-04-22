@@ -61,6 +61,7 @@ public class _706_设计哈希映射 {
                     } else {
                         nodes[index] = node.next;
                     }
+                    return;
                 }
                 prev = node;
                 node = node.next;

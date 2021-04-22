@@ -6,27 +6,25 @@ package 二叉树;
  */
 public class _117_填充每个节点的下一个右侧节点指针_II {
     public Node connect(Node root) {
-        if (root == null) return null;
+        Node dummy = new Node();
+        dummy.next = root;
 
-        Node pre = root;
-        while (pre != null) {
-            Node parent = pre;
-            Node dummy = new Node();
-            Node cur = dummy;
-            while (parent != null) {
-                if (parent.left != null) {
-                    cur.next = parent.left;
-                    cur = cur.next;
+        while (dummy.next != null) {
+            Node cur = dummy.next;
+            Node tail = dummy;
+            dummy.next = null;
+            while (cur != null) {
+                if (cur.left != null) {
+                    tail.next = cur.left;
+                    tail = tail.next;
                 }
-                if (parent.right != null) {
-                    cur.next = parent.right;
-                    cur = cur.next;
+                if (cur.right != null) {
+                    tail.next = cur.right;
+                    tail = tail.next;
                 }
-                parent = parent.next;
+                cur = cur.next;
             }
-            pre = dummy.next;
         }
-
         return root;
     }
 
@@ -48,5 +46,5 @@ public class _117_填充每个节点的下一个右侧节点指针_II {
             right = _right;
             next = _next;
         }
-    };
+    }
 }
