@@ -4,6 +4,7 @@ import common.TreeNode;
 
 /**
  * https://leetcode-cn.com/problems/largest-bst-subtree/
+ * https://leetcode-cn.com/problems/largest-bst-subtree/solution/si-lu-qing-xi-de-javadai-ma-onfu-za-du-1ms-by-jzj1/
  */
 public class _333_最大BST子树 {
     public int largestBSTSubtree(TreeNode root) {
