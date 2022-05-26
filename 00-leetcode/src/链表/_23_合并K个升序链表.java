@@ -9,8 +9,7 @@ public class _23_合并K个升序链表 {
     // 分治
     public ListNode mergeKLists(ListNode[] lists) {
         if (lists == null || lists.length == 0) return null;
-        ListNode newHead = mergeKLists(lists, 0, lists.length);
-        return newHead;
+        return mergeKLists(lists, 0, lists.length);
     }
 
     private ListNode mergeKLists(ListNode[] lists, int begin, int end) {
