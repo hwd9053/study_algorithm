@@ -24,14 +24,16 @@ public class _78_子集 {
             res.add(new ArrayList<>(resList));
             return;
         }
+        // 使用当前元素并进入下一层
         resList.add(nums[idx]);
         dfs(idx + 1, nums, res, resList);
+        // 不使用当前元素并进入下一层
         resList.remove(resList.size() - 1);
         dfs(idx + 1, nums, res, resList);
     }
 
 
-    // 回溯
+    // 回溯(树的前序遍历)
     public List<List<Integer>> subsets2(int[] nums) {
         if (nums == null) return null;
         List<List<Integer>> res = new ArrayList<>();
