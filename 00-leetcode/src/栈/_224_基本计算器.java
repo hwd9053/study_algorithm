@@ -1,5 +1,7 @@
 package 栈;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Stack;
 
 /**
@@ -42,6 +44,37 @@ public class _224_基本计算器 {
             } else { // 遇到右括号，出栈更新结果
                 ans = ops.pop() * ans + nums.pop();
             }
+        }
+        return ans;
+    }
+
+    // https://leetcode.cn/problems/basic-calculator/solutions/2384893/javapython3czhan-zhan-kai-gua-hao-qiu-he-uu72/?company_slug=microsoft
+    public int calculate2(String s) {
+        Deque<Integer> stack = new ArrayDeque<>(); // 用来保存每一层的符号
+        int sign = 1;
+        stack.push(sign);
+        int ans = 0, idx = 0;
+        char[] cs = s.toCharArray();
+
+        int n = cs.length;
+        while (idx < n) {
+            char c = cs[idx];
+            if (Character.isDigit(c)) {
+                int num = c - '0';
+                while (idx + 1 < n && Character.isDigit(cs[idx + 1])) {
+                    num = num * 10 + (cs[++idx] - '0');
+                }
+                ans += sign * num;
+            } else if (c == '+') {
+                sign = stack.peek();
+            } else if (c == '-') {
+                sign = -stack.peek();
+            } else if (c == '(') {
+                stack.push(sign);
+            } else if (c == ')') {
+                stack.pop();
+            }
+            idx++;
         }
         return ans;
     }

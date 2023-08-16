@@ -2,12 +2,15 @@ package 栈_队列;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * https://leetcode-cn.com/problems/sliding-window-maximum/
  */
 public class _239_滑动窗口最大值 {
 
+    // 笨办法。O(nk)
     public int[] maxSlidingWindow(int[] nums, int k) {
         if (nums == null || nums.length == 0 || k < 1) return null;
         if (k == 1) return nums;
@@ -69,5 +72,27 @@ public class _239_滑动窗口最大值 {
             maxes[li] = nums[deque.peek()];
         }
         return maxes;
+    }
+
+    // 优先队列
+    public int[] maxSlidingWindow3(int[] nums, int k) {
+        int i = 0;
+        Queue<int[]> queue = new PriorityQueue<>((a1, a2) -> a2[0] == a1[0] ? a2[1] - a1[1] : a2[0] - a1[0]);
+        for (;i < k; i++) {
+            queue.offer(new int[] {nums[i], i});
+        }
+        int n = nums.length;
+        int[] ans = new int[n - k + 1];
+        ans[0] = queue.peek()[0];
+        for (i = 1; i <= n - k; i++) {
+            int r = i + k - 1;
+            queue.offer(new int[] {nums[r], r});
+            while (queue.peek()[1] < i) {
+                queue.poll();
+            }
+            ans[i] = queue.peek()[0];
+        }
+
+        return ans;
     }
 }
