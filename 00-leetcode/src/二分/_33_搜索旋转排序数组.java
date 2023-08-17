@@ -77,4 +77,65 @@ public class _33_搜索旋转排序数组 {
 
         return -1;
     }
+
+    public int search3(int[] nums, int target) {
+        int li = 0, ri = nums.length - 1;
+        while (li < ri) {
+            int mid = (li + ri) >> 1;
+            if (target == nums[mid]) return mid;
+            // 前半部有序
+            if (nums[li] <= nums[mid]) {
+                if (target >= nums[li] && target < nums[mid]) {
+                    ri = mid - 1;
+                } else {
+                    li = mid + 1;
+                }
+            } else { // 后半部分有序
+                if (target > nums[mid] && target <= nums[ri]) {
+                    li = mid + 1;
+                } else {
+                    ri = mid - 1;
+                }
+            }
+        }
+
+        return nums[li] == target ? li : -1;
+    }
+
+    // https://leetcode.cn/problems/search-in-rotated-sorted-array/solution/shua-chuan-lc-yan-ge-ologn100yi-qi-kan-q-xifo/
+    public int search4(int[] nums, int target) {
+        int l = 0, r = nums.length - 1;
+
+        // 先找到旋转点。如[4,5,6,7,1,2,3]，那么7就是要找的点。7前面是一段，7后面是一段
+        while (l < r) {
+            // 记住这个+1，原因是向上取整，避免死循环
+            int mid = (l + r + 1) / 2;
+            if (nums[0] <= nums[mid]) {
+                l = mid;
+            } else {
+                // nums[mid] < nums[0], 即mid在第二段里面
+                r = mid - 1;
+            }
+        }
+
+        if (target >= nums[0]) {
+            l = 0;
+        } else {
+            l = l + 1;
+            r = nums.length - 1;
+        }
+
+        while (l < r) {
+            int mid = (l + r) / 2;
+            if (target == nums[mid]) return mid;
+            if (target < nums[mid]) {
+                r = mid - 1;
+            } else {
+                l = mid + 1;
+            }
+        }
+
+        // 注意这里用l会越界。因为第一次二分的mid是向上取整的，可能为数组最后一个元素。而第二次二分的l可能为l(mid) + 1就越界了
+        return nums[r] == target ? r : -1;
+    }
 }

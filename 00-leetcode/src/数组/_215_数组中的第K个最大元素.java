@@ -25,8 +25,8 @@ public class _215_数组中的第K个最大元素 {
 
     private int partition(int[] nums, int l, int r) {
         int index = (int) (Math.random() * (r - l + 1)) + l;
-        swap(nums, l, index);
-        int pivot = nums[l];
+        int pivot = nums[index];
+        nums[index] = nums[l];
 
         while (l < r) {
             while (l < r) {
@@ -48,12 +48,6 @@ public class _215_数组中的第K个最大元素 {
         }
         nums[l] = pivot;
         return l;
-    }
-
-    private void swap(int[] nums, int l, int index) {
-        int tmp = nums[l];
-        nums[l] = nums[index];
-        nums[index] = tmp;
     }
 
     // 维持k个元素的小顶堆
